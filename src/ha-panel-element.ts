@@ -6,7 +6,7 @@ export default class IlluminatrixPanel extends HTMLElement {
   private props: Record<string, any> | null = null;
   private app: App | null = null;
 
-  setProperties(props) {
+  setProperties(props: Record<string, any>): void {
     this.props = props;
     this.app?.$set(this.props);
   }

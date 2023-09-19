@@ -87,7 +87,7 @@
               on:click={() =>
                 setEnabledLights(
                   "add",
-                  groupedLights[area].map((l) => l.id),
+                  (groupedLights[area] ?? []).map((l) => l.id),
                 )}
             >
               All
@@ -97,7 +97,7 @@
               on:click={() =>
                 setEnabledLights(
                   "remove",
-                  groupedLights[area].map((l) => l.id),
+                  (groupedLights[area] ?? []).map((l) => l.id),
                 )}
             >
               None
@@ -105,7 +105,7 @@
           </td>
         </tr>
       {/if}
-      {#each sortLights(groupedLights[area]) as light}
+      {#each sortLights(groupedLights[area] ?? []) as light}
         <tr>
           <td>
             <label>

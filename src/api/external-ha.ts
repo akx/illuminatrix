@@ -106,8 +106,9 @@ export default class ExternalHALightAPI extends BaseHALightAPI {
     const statesResult = await ws.sendCommandAndWait<HAStatesResult>({
       type: "get_states",
     });
+    const registry = this._registry ?? undefined;
     return [...statesResult.result]
       .filter(isHALightState)
-      .map((hals) => haLightStateToAppLightState(hals, this._registry));
+      .map((hals) => haLightStateToAppLightState(hals, registry));
   }
 }

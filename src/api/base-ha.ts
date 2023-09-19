@@ -9,7 +9,7 @@ export abstract class BaseHALightAPI implements LightAPI {
     payload: Record<string, any>,
   ): Promise<void>;
 
-  abstract getLightStates();
+  abstract getLightStates(): Promise<LightState[]>;
 
   public setLightBrightness(entityId: string, value: number) {
     return this.callLightService(`turn_on`, {
@@ -24,6 +24,7 @@ export abstract class BaseHALightAPI implements LightAPI {
     brightness?: number,
   ) {
     const [rgb] = typeof rgbx === "string" ? getColorRGBs([rgbx]) : [rgbx];
+    if (!rgb) throw new Error("Invalid color");
     const payload: Record<string, any> = {
       entity_id: entityId,
       rgb_color: rgbTo8BitRGBTriple(rgb),
@@ -65,11 +66,14 @@ function getAreaFromState(
         return entityArea;
       }
     }
-    const device = devices[entity.device_id];
-    if (device && device.area_id) {
-      const deviceArea = areas[device.area_id];
-      if (deviceArea) {
-        return deviceArea;
+    const deviceId = entity.device_id;
+    if (deviceId) {
+      const device = devices[deviceId];
+      if (device && device.area_id) {
+        const deviceArea = areas[device.area_id];
+        if (deviceArea) {
+          return deviceArea;
+        }
       }
     }
   }
