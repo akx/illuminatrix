@@ -58,15 +58,12 @@ async function getStaticRegistry(
   const areaPromise = ws.sendCommandAndWait<HAAreaRegistryResult>(
     "config/area_registry/list",
   );
-  const [devs, ents, areas] = await Promise.all([
-    devicePromise,
-    entityPromise,
-    areaPromise,
-  ]);
+  const [{ result: devices }, { result: entities }, { result: areas }] =
+    await Promise.all([devicePromise, entityPromise, areaPromise]);
   return {
-    devices: Object.fromEntries(devs.result.map((d) => [d.device_id, d])),
-    entities: Object.fromEntries(ents.result.map((e) => [e.entity_id, e])),
-    areas: Object.fromEntries(areas.result.map((a) => [a.area_id, a])),
+    devices: Object.fromEntries(devices.map((d) => [d.id, d])),
+    entities: Object.fromEntries(entities.map((e) => [e.entity_id, e])),
+    areas: Object.fromEntries(areas.map((a) => [a.area_id, a])),
   };
 }
 
