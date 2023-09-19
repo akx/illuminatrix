@@ -6,7 +6,7 @@ export interface Variation {
   maximum: number;
 }
 
-function birand(x) {
+function birand(x: number) {
   return Math.random() * x * (Math.random() > 0.5 ? 1 : -1);
 }
 
@@ -30,6 +30,7 @@ export function varyColor(
   if (!oklch) throw new Error("Invalid color");
   if (lVariation) oklch.l = applyVariation(oklch.l, lVariation);
   if (cVariation) oklch.c = applyVariation(oklch.c, cVariation);
-  if (hVariation) oklch.h = applyVariation(oklch.h / 360, hVariation) * 360;
+  if (hVariation)
+    oklch.h = applyVariation((oklch.h ?? 0) / 360, hVariation) * 360;
   return culori.clampRgb(culori.rgb(oklch));
 }

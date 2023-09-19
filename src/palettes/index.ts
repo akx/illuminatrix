@@ -60,10 +60,12 @@ function decompressPalette(
       ...defaults,
       name,
       colors: compressedColorsOrIndices.map((c) =>
-        typeof c === "string" ? decompressColorString(c) : colorMap[c],
+        typeof c === "string"
+          ? decompressColorString(c)
+          : colorMap[c] ?? "#ff00ff",
       ),
       date: new Date(timestamp * 1000).toISOString(),
-      tags: tagIndices.map((i) => tagMap[i]),
+      tags: tagIndices.map((i) => tagMap[i] ?? "<unknown>"),
       ...(extra || {}),
     };
   }
@@ -83,7 +85,7 @@ function getPalettesFromCollection({
   const tagMap = tag_indices ?? [];
   const colorMap = (color_indices ?? []).map(decompressColorString);
   return palettes.map((data) =>
-    decompressPalette(data, defaults, tagMap, colorMap),
+    decompressPalette(data, defaults ?? {}, tagMap, colorMap),
   );
 }
 
@@ -91,8 +93,9 @@ function shuffle<T>(x: T[]): void {
   // Fisher-Yates shuffle
   for (let i = x.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    const t = x[i];
-    x[i] = x[j];
+    // casts are OK: we know i and j are in bounds
+    const t = x[i] as T;
+    x[i] = x[j] as T;
     x[j] = t;
   }
 }

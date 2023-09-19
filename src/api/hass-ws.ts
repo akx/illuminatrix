@@ -94,7 +94,7 @@ export default class HassWebSocket {
         msg = { type: msg };
       }
       const id = this.sendCommand(msg);
-      const pair = { resolve, reject };
+      const pair = { resolve, reject } as WaiterPair;
       this.waiters[id] = pair;
       setTimeout(() => {
         if (this.waiters[id] === pair) {

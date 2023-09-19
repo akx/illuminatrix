@@ -32,7 +32,10 @@ export function* randomBag<T>(arr: readonly T[]): Generator<T, never> {
       bag.push(...arr);
     }
     const index = Math.floor(Math.random() * bag.length);
-    yield bag.splice(index, 1)[0];
+    const elements = bag.splice(index, 1);
+    if (elements[0] !== undefined) {
+      yield elements[0];
+    }
   }
 }
 

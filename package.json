@@ -16,6 +16,7 @@
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.4.6",
     "@types/culori": "^2.0.1",
+    "@types/lodash-es": "^4.17.9",
     "@typescript-eslint/eslint-plugin": "^6.7.2",
     "@typescript-eslint/parser": "^6.7.2",
     "autoprefixer": "^10.4.15",

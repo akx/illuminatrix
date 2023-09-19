@@ -20,10 +20,10 @@
   import type { Hass } from "./types/ha";
   import type { LightState, SetLight } from "./types/app";
   import { getColors, getEnabledLights, persistState } from "./state";
-  import { getAPI } from "./api/helpers";
+  import { getAPI, isValidHass } from "./api/helpers";
 
-  export const hass: Hass | null = null;
-  const darkMode = !!hass?.themes.darkMode;
+  export let hass: Hass | null = null;
+  const darkMode = isValidHass(hass) ? hass.themes.darkMode : false;
   const lightAPI = getAPI(hass);
 
   let enabledLights: string[] = getEnabledLights();

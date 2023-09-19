@@ -10,8 +10,16 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "allowJs": true,
-    "checkJs": true,
-    "noUncheckedIndexedAccess": true
+    "checkJs": false,
+    "alwaysStrict": true,
+    "exactOptionalPropertyTypes": false,
+    "noFallthroughCasesInSwitch": false,
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUncheckedIndexedAccess": true,
+    "strict": true
   },
   "include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.ts", "src/**/*.svelte"]
 }
