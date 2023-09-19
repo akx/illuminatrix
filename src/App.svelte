@@ -15,17 +15,16 @@
   } from "./consts";
   import { delay, getColorRGBs } from "./helpers";
   import * as apply from "./apply";
-  import type { LightAPI } from "./api/base";
-  import EmbeddedHALightAPI from "./api/embedded-ha";
-  import ExternalHALightAPI from "./api/external-ha";
   import cx from "clsx";
   import type { Palette } from "./palettes/types";
   import type { Hass } from "./types/ha";
   import type { LightState, SetLight } from "./types/app";
   import { getColors, getEnabledLights, persistState } from "./state";
+  import { getAPI } from "./api/helpers";
 
-  export let hass: Hass | null = null;
+  export const hass: Hass | null = null;
   const darkMode = !!hass?.themes.darkMode;
+  const lightAPI = getAPI(hass);
 
   let enabledLights: string[] = getEnabledLights();
   let colors: string[] = getColors();
@@ -37,15 +36,8 @@
   let cVariation: Variation = { ...defaultCVariation };
   let hVariation: Variation = { ...defaultHVariation };
 
-  function getAPI(): LightAPI {
-    if (hass?.states && hass?.callService) {
-      return new EmbeddedHALightAPI(hass);
-    }
-    return new ExternalHALightAPI();
-  }
-
   async function reloadLights() {
-    lights = await getAPI().getLightStates();
+    lights = await lightAPI.getLightStates();
   }
 
   async function applyColors(variation: boolean) {
@@ -57,7 +49,7 @@
       // probably out of quota
     }
     const result = await apply.applyColors({
-      api: getAPI(),
+      api: lightAPI,
       rgbs,
       entityIds: enabledLights,
       lVariation: variation ? lVariation : null,
@@ -84,15 +76,14 @@
 
   async function setLight(e: CustomEvent<SetLight>) {
     const { entityId, brightness, color, state } = e.detail;
-    const api = getAPI();
     if (brightness !== undefined) {
-      await api.setLightBrightness(entityId, brightness);
+      await lightAPI.setLightBrightness(entityId, brightness);
     }
     if (color !== undefined) {
-      await api.setLightColor(entityId, color);
+      await lightAPI.setLightColor(entityId, color);
     }
     if (state !== undefined) {
-      await api.setLightState(entityId, state);
+      await lightAPI.setLightState(entityId, state);
     }
     await delay(500);
     await reloadLights();
