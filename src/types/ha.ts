@@ -77,6 +77,7 @@ export interface Entity {
   entity_id: string;
   area_id?: string | null;
   device_id?: string | null;
+  platform?: string | null;
 }
 
 export interface Device {

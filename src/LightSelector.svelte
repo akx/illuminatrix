@@ -15,10 +15,11 @@
     return orderBy(
       lights,
       [
+        (l: LightState) => l.isGroup,
         (l: LightState) => ["unavailable", "off", "on"].indexOf(l.state),
         (l: LightState) => l.friendlyName ?? l.id,
       ],
-      ["desc", "asc"],
+      ["asc", "desc", "asc"],
     );
   }
 
@@ -114,7 +115,13 @@
                 bind:group={enabledLights}
                 value={light.id}
               />
-              <span class={cx({ "opacity-25": light.state === "unavailable" })}>
+              <span
+                class={cx({ "opacity-25": light.state === "unavailable" })}
+                title={light.isGroup ? "Group" : undefined}
+              >
+                {#if light.isGroup}
+                  📦
+                {/if}
                 {light.friendlyName ?? light.id}
               </span>
             </label>

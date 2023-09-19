@@ -21,4 +21,5 @@ export interface LightState {
   rgbColor?: [number, number, number];
   areaId: string | null;
   areaFriendlyName: string | null;
+  isGroup?: boolean;
 }

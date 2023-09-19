@@ -85,6 +85,8 @@ export function haLightStateToAppLightState(
   stateMaps: HassStaticRegistry = NO_STATE_MAPS,
 ): LightState {
   const area = getAreaFromState(hals, stateMaps);
+  const entity: Entity | undefined = stateMaps.entities[hals.entity_id];
+  const isGroup = entity?.platform === "group";
   return {
     id: hals.entity_id,
     friendlyName: hals.attributes.friendly_name,
@@ -93,5 +95,6 @@ export function haLightStateToAppLightState(
     rgbColor: hals.attributes.rgb_color,
     areaId: area?.area_id ?? null,
     areaFriendlyName: area?.name ?? null,
+    isGroup,
   };
 }
