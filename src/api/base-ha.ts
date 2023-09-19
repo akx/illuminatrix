@@ -1,6 +1,11 @@
 import type { LightAPI } from "./base";
 import { clampInteger, getColorRGBs, rgbTo8BitRGBTriple } from "../helpers";
-import type { Area, HALightState, HassStaticRegistry } from "../types/ha";
+import type {
+  Area,
+  Entity,
+  HALightState,
+  HassStaticRegistry,
+} from "../types/ha";
 import type { Rgb, LightState } from "../types/app";
 
 export abstract class BaseHALightAPI implements LightAPI {
