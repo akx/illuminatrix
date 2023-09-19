@@ -80,7 +80,7 @@ export interface Entity {
 }
 
 export interface Device {
-  device_id: string;
+  id: string; // of course it's not `device_id`
   area_id: string | null;
 }
 

@@ -1,6 +1,6 @@
 import type { LightAPI } from "./base";
 import { clampInteger, getColorRGBs, rgbTo8BitRGBTriple } from "../helpers";
-import type { Area, Device, Entity, HALightState } from "../types/ha";
+import type { Area, HALightState, HassStaticRegistry } from "../types/ha";
 import type { Rgb, LightState } from "../types/app";
 
 export abstract class BaseHALightAPI implements LightAPI {
@@ -55,7 +55,7 @@ const NO_STATE_MAPS = { entities: {}, devices: {}, areas: {} };
 
 function getAreaFromState(
   state: HALightState,
-  { areas, devices, entities }: StateMaps,
+  { areas, devices, entities }: HassStaticRegistry,
 ): Area | undefined {
   const entity = entities[state.entity_id];
   if (entity) {
@@ -76,15 +76,9 @@ function getAreaFromState(
   return undefined;
 }
 
-type StateMaps = {
-  entities: Readonly<Record<string, Entity>>;
-  devices: Readonly<Record<string, Device>>;
-  areas: Readonly<Record<string, Area>>;
-};
-
 export function haLightStateToAppLightState(
   hals: HALightState,
-  stateMaps: StateMaps = NO_STATE_MAPS,
+  stateMaps: HassStaticRegistry = NO_STATE_MAPS,
 ): LightState {
   const area = getAreaFromState(hals, stateMaps);
   return {
