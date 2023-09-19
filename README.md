@@ -36,6 +36,7 @@ panel_custom:
 
 and then either:
 
+- download the `dist-lib.zip` artifact from [a release][releases]
 - download the `dist-lib` artifact of [a recent GitHub Actions CI build][gha-actions]
 - build an embeddable build of Illuminatrix into your Home Assistant's `www` directory with
   ```
@@ -61,6 +62,14 @@ your Home Assistant instance's API URL and a long-lived access token. For exampl
 ```
 VITE_HA_API_URL=http://192.168.1.20:8123/api/
 VITE_HA_API_TOKEN=eyThisIsAJWT.eyEyEy.Q46nGblaaahpB0X5nMwmVQLEHk
+```
+
+You'll also need to make sure your Home Assistant instance allows CORS requests from the Vite origin:
+
+```yaml
+http:
+  cors_allowed_origins:
+    - http://localhost:5173
 ```
 
 Then, run `pnpm dev` to start the development server and open `http://localhost:5173` in your browser.
@@ -138,3 +147,4 @@ Quoting the FAQ from the Tumblr:
 [tw]: https://tailwindcss.com/
 [vite]: https://vitejs.dev/
 [gha-actions]: https://github.com/akx/illuminatrix/actions
+[releases]: https://github.com/akx/illuminatrix/releases
