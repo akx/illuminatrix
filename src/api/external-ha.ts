@@ -3,51 +3,114 @@ import {
   haLightStateToAppLightState,
   isHALightState,
 } from "./base-ha";
+import HassWebSocket from "./hass-ws";
+import type { HassStaticRegistry } from "../types/ha";
 
-function makeHeaders(extra: Record<string, string> = {}) {
+import type { Area, Device, Entity } from "../types/ha";
+
+interface HAResult {
+  type: "result";
+  id: number;
+  success: boolean;
+}
+
+export interface HAStatesResult extends HAResult {
+  result: any[];
+}
+
+export interface HADeviceRegistryResult extends HAResult {
+  result: Device[];
+}
+
+export interface HAEntityRegistryResult extends HAResult {
+  result: Entity[];
+}
+
+export interface HAAreaRegistryResult extends HAResult {
+  result: Area[];
+}
+
+function getHomeAssistantApiToken() {
   const token = import.meta.env?.VITE_HA_API_TOKEN;
   if (!token) {
     throw new Error("Missing VITE_HA_API_TOKEN");
   }
-  return {
-    Authorization: `Bearer ${token}`,
-    ...extra,
-  };
+  return token;
 }
 
-function makeUrl(url: string) {
+function getHomeAssistantApiUrl() {
   const baseUrl = import.meta.env?.VITE_HA_API_URL;
   if (!baseUrl) {
     throw new Error("Missing VITE_HA_API_URL");
   }
-  return new URL(url, baseUrl);
+  return baseUrl;
 }
 
-async function getHA<T = any>(url: string): Promise<T> {
-  const res = await fetch(makeUrl(url), {
-    headers: makeHeaders(),
-  });
-  return res.json();
-}
-
-async function postHA(url: string, payload: any): Promise<void> {
-  await fetch(makeUrl(url), {
-    method: "POST",
-    headers: makeHeaders({
-      "Content-Type": "application/json",
-    }),
-    body: JSON.stringify(payload),
-  });
+async function getStaticRegistry(
+  ws: HassWebSocket,
+): Promise<HassStaticRegistry> {
+  const devicePromise = ws.sendCommandAndWait<HADeviceRegistryResult>(
+    "config/device_registry/list",
+  );
+  const entityPromise = ws.sendCommandAndWait<HAEntityRegistryResult>(
+    "config/entity_registry/list",
+  );
+  const areaPromise = ws.sendCommandAndWait<HAAreaRegistryResult>(
+    "config/area_registry/list",
+  );
+  const [devs, ents, areas] = await Promise.all([
+    devicePromise,
+    entityPromise,
+    areaPromise,
+  ]);
+  return {
+    devices: Object.fromEntries(devs.result.map((d) => [d.device_id, d])),
+    entities: Object.fromEntries(ents.result.map((e) => [e.entity_id, e])),
+    areas: Object.fromEntries(areas.result.map((a) => [a.area_id, a])),
+  };
 }
 
 export default class ExternalHALightAPI extends BaseHALightAPI {
-  callLightService(service: string, payload: Record<string, any>) {
-    return postHA(`services/light/${service}`, payload);
+  private _ws: HassWebSocket | null = null;
+  private _registry: HassStaticRegistry | null = null;
+
+  private onDisconnect = (ws: HassWebSocket) => {
+    if (ws === this._ws) {
+      this._ws = null;
+      this._registry = null;
+    }
+  };
+
+  private async getWs() {
+    if (!this._ws) {
+      const ws = new HassWebSocket();
+      await ws.connect(getHomeAssistantApiUrl(), getHomeAssistantApiToken());
+      this._ws = ws;
+      ws.addDisconnectionCallback(this.onDisconnect);
+    }
+    return this._ws;
+  }
+
+  async callLightService(service: string, payload: Record<string, any>) {
+    const ws = await this.getWs();
+    await ws.sendCommandAndWait({
+      type: "call_service",
+      domain: "light",
+      service,
+      service_data: payload,
+    });
   }
 
   async getLightStates() {
-    return [...(await getHA("states"))]
+    const ws = await this.getWs();
+    if (!this._registry) {
+      this._registry = await getStaticRegistry(ws);
+    }
+    const statesResult = await ws.sendCommandAndWait<HAStatesResult>({
+      type: "get_states",
+    });
+    return [...statesResult.result]
       .filter(isHALightState)
-      .map((hals) => haLightStateToAppLightState(hals));
+      .map((hals) => haLightStateToAppLightState(hals, this._registry));
   }
 }
