@@ -53,8 +53,8 @@ Before you ask, no, I have no idea how to do this for Home Assistant OS, since I
 Illuminatrix is written in [Svelte][svelte] and TypeScript, using [Tailwind][tw] for styling.
 [Vite][vite] bundles things.
 
-Since the Home Assistant frontend can be a bit tedious to work with, Illuminatrix can be run as a standalone web app
-using the Home Assistant REST API. (Areas aren't supported by the API, so you won't see which rooms your lights are in.)
+Since the Home Assistant frontend can be a bit tedious to work with,
+Illuminatrix can be run as a standalone web app using the Home Assistant websocket API.
 
 To run Illuminatrix in development mode, you'll need an `.env.development.local` file pointing towards
 your Home Assistant instance's API URL and a long-lived access token. For example:

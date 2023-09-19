@@ -74,11 +74,13 @@ export enum StateState {
 }
 
 export interface Entity {
+  entity_id: string;
   area_id?: string | null;
   device_id?: string | null;
 }
 
 export interface Device {
+  device_id: string;
   area_id: string | null;
 }
 
@@ -87,13 +89,17 @@ export interface Area {
   name: string;
 }
 
-export interface Hass {
-  callService(domain: string, service: string, data: any): Promise<void>;
-
-  states: Record<string, Record<string, any>>;
+// Not perfectly static, really, but good enough for us...
+export interface HassStaticRegistry {
   entities: Record<string, Entity>;
   devices: Record<string, Device>;
   areas: Record<string, Area>;
+}
+
+export interface Hass extends HassStaticRegistry {
+  callService(domain: string, service: string, data: any): Promise<void>;
+
+  states: Record<string, Record<string, any>>;
 
   themes: { darkMode: boolean };
 }
