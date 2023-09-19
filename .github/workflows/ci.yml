@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2.4.0
+        with:
+          version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "20.x"
+          cache: pnpm
+      - run: pnpm i --frozen-lockfile
+      - run: pnpm svelte-check
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2.4.0
+        with:
+          version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "20.x"
+          cache: pnpm
+      - run: pnpm i --frozen-lockfile
+      - run: pnpm prettier-check
+      - run: pnpm lint
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2.4.0
+        with:
+          version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "20.x"
+          cache: pnpm
+      - run: pnpm i --frozen-lockfile
+      - run: pnpm build
+        name: Build library
+        env:
+          ILLUMINATRIX_LIB: "1"
+          ILLUMINATRIX_OUT_DIR: ./dist-lib/
+      - run: pnpm build
+        name: Build standalone
+        env:
+          ILLUMINATRIX_OUT_DIR: ./dist-standalone/
+      - name: Upload library build
+        uses: actions/upload-artifact@v3
+        with:
+          path: dist-lib
+          name: dist-lib
