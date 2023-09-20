@@ -41,6 +41,9 @@ body {
       dark:bg-gray-800 dark:hover:bg-gray-700
       focus:outline-none focus:ring-2 focus:ring-opacity-75;
   }
+  .btn[disabled] {
+    @apply opacity-50 cursor-not-allowed;
+  }
   .btn-primary {
     @apply bg-blue-500 text-white hover:bg-blue-700 focus:ring-blue-400;
     @apply dark:bg-blue-800 dark:hover:bg-blue-700;

@@ -110,6 +110,7 @@
               🚫
             {:else}
               <button
+                class="btn btn-xs"
                 on:click={() =>
                   dispatch("set", {
                     entityId: light.id,
