@@ -38,6 +38,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 5
+          fetch-tags: true
       - uses: pnpm/action-setup@v2.4.0
         with:
           version: 8
@@ -55,8 +58,11 @@ jobs:
         name: Build standalone
         env:
           ILLUMINATRIX_OUT_DIR: ./dist-standalone/
+      - name: Git describe
+        id: git-describe
+        run: echo tag=$(git describe --always) >> $GITHUB_OUTPUT
       - name: Upload library build
         uses: actions/upload-artifact@v3
         with:
           path: dist-lib
-          name: dist-lib
+          name: dist-lib-${{ steps.git-describe.outputs.tag }}
