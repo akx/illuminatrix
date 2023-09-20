@@ -12,6 +12,7 @@
     defaultCVariation,
     defaultHVariation,
     defaultLVariation,
+    version,
   } from "./consts";
   import { delay, getColorRGBs } from "./helpers";
   import * as apply from "./apply";
@@ -23,6 +24,7 @@
   import { isValidHass } from "./api/helpers";
   import EmbeddedHALightAPI from "./api/embedded-ha";
   import ExternalHALightAPI from "./api/external-ha";
+  import BrightnessControls from "./BrightnessControls.svelte";
 
   export let hass: Hass | null = null;
   const getHass = () => {
@@ -127,41 +129,11 @@
       >Apply with variation
     </button>
   </div>
-  <div class="p-2 text-center">
-    Brightness:
-    <input
-      type="range"
-      min="0"
-      max="3"
-      step="0.01"
-      bind:value={brightnessMultiplier}
-      disabled={brightnessMode === "keep"}
-    />
-    {Math.round(brightnessMultiplier * 100)}%
-    <label class="label inline cursor-pointer">
-      <input
-        class="radio radio-sm"
-        type="radio"
-        bind:group={brightnessMode}
-        value="keep"
-      /> Keep
-    </label>
-    <label class="label inline cursor-pointer">
-      <input
-        class="radio radio-sm"
-        type="radio"
-        bind:group={brightnessMode}
-        value="set"
-      /> From color
-    </label>
-    <label class="label inline cursor-pointer">
-      <input
-        class="radio radio-sm"
-        type="radio"
-        bind:group={brightnessMode}
-        value="static"
-      /> Static
-    </label>
+  <div class="p-2 flex gap-1 justify-between">
+    <BrightnessControls bind:brightnessMode bind:brightnessMultiplier />
+    <div class="opacity-50">
+      Illuminatrix {version}
+    </div>
   </div>
   <div class={"flex flex-1 p-1 gap-1 flex-col md:flex-row min-h-[20em]"}>
     <Section title="Lights">
