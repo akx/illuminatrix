@@ -22,3 +22,6 @@ export const defaultHVariation: Variation = {
   maximum: 1,
 };
 export const standaloneRootSelector = "#illuminatrix-root";
+export const version = String(
+  import.meta.env?.VITE_ILLUMINATRIX_VERSION ?? "unknown",
+);

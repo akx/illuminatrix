@@ -4,6 +4,7 @@ import { resolve } from "path";
 
 const isLibBuild = !!process.env.ILLUMINATRIX_LIB;
 process.env.VITE_ILLUMINATRIX_LIB = isLibBuild ? "1" : "";
+process.env.VITE_ILLUMINATRIX_VERSION = require("./package.json").version;
 
 // https://vitejs.dev/config/
 export default defineConfig({
