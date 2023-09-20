@@ -6,11 +6,17 @@ import {
 import type { Hass } from "../types/ha";
 
 export default class EmbeddedHALightAPI extends BaseHALightAPI {
-  private hass: Hass;
+  private _getHass: () => Hass;
 
-  constructor(hass: Hass) {
+  // We need a trampoline function to get the newest `hass` object
+  // that the HA UI passes down to our panel.
+  constructor(getHass: () => Hass) {
     super();
-    this.hass = hass;
+    this._getHass = getHass;
+  }
+
+  private get hass() {
+    return this._getHass();
   }
 
   callLightService(service: string, payload: Record<string, any>) {
