@@ -1,31 +1,25 @@
 <script lang="ts">
   import cx from "clsx";
-  import orderBy from "lodash-es/orderBy";
-  import groupBy from "lodash-es/groupBy";
   import { createEventDispatcher } from "svelte";
-
-  const dispatch = createEventDispatcher();
   import type { LightState } from "./types/app";
   import { rgbTripleToHex } from "./helpers";
+  import { groupLights } from "./lightSelectorHelpers";
+
+  const dispatch = createEventDispatcher();
 
   export let lights: LightState[] = [];
   export let enabledLights: string[] = [];
 
-  function sortLights(lights: readonly LightState[]): LightState[] {
-    return orderBy(
-      lights,
-      [
-        (l: LightState) => ["unavailable", "off", "on"].indexOf(l.state),
-        (l: LightState) => l.friendlyName ?? l.id,
-      ],
-      ["desc", "asc"],
-    );
-  }
-
   function setEnabledLights(
     mode: "set" | "add" | "remove",
-    ids: string[] = [],
+    lights: readonly LightState[] = [],
+    onlyNonGroups: boolean = false,
   ) {
+    if (onlyNonGroups) {
+      lights = lights.filter((l) => !l.isGroup);
+    }
+    const ids = lights.map((l) => l.id);
+
     switch (mode) {
       case "set":
         enabledLights = ids;
@@ -39,11 +33,7 @@
     }
   }
 
-  $: groupedLights = groupBy(
-    lights,
-    (l: LightState) => l.areaFriendlyName ?? "\uFEFFOther",
-  );
-  $: groupOrder = Object.keys(groupedLights).sort();
+  $: lightGroups = groupLights(lights, enabledLights);
   const stateTexts = {
     unavailable: "🚫",
     off: "Off",
@@ -55,11 +45,7 @@
   <div class="pb-2">
     <button
       class="btn btn-outline"
-      on:click={() =>
-        setEnabledLights(
-          "set",
-          lights.map((l) => l.id),
-        )}
+      on:click={() => setEnabledLights("set", lights)}
     >
       All
     </button>
@@ -75,37 +61,31 @@
 </div>
 <table class={"w-full"}>
   <tbody>
-    {#each groupOrder as area}
-      {#if groupOrder.length > 1}
+    {#each lightGroups as group (group.name)}
+      {#if lightGroups.length > 1}
         <tr>
           <td class={"font-bold"}>
-            {area}
+            {group.name}
           </td>
           <td colspan="3" class="text-right">
             <button
               class="btn btn-outline btn-xs"
-              on:click={() =>
-                setEnabledLights(
-                  "add",
-                  (groupedLights[area] ?? []).map((l) => l.id),
-                )}
+              on:click={(e) =>
+                setEnabledLights("add", group.lights, !e.shiftKey)}
             >
               All
             </button>
             <button
               class="btn btn-outline btn-xs"
-              on:click={() =>
-                setEnabledLights(
-                  "remove",
-                  (groupedLights[area] ?? []).map((l) => l.id),
-                )}
+              on:click={(e) =>
+                setEnabledLights("remove", group.lights, !e.shiftKey)}
             >
               None
             </button>
-          </td>
-        </tr>
+          </td></tr
+        >
       {/if}
-      {#each sortLights(groupedLights[area] ?? []) as light}
+      {#each group.lights as light}
         <tr>
           <td>
             <label>
@@ -114,7 +94,13 @@
                 bind:group={enabledLights}
                 value={light.id}
               />
-              <span class={cx({ "opacity-25": light.state === "unavailable" })}>
+              <span
+                class={cx({ "opacity-25": light.state === "unavailable" })}
+                title={light.isGroup ? "Group" : undefined}
+              >
+                {#if light.isGroup}
+                  📦
+                {/if}
                 {light.friendlyName ?? light.id}
               </span>
             </label>
