@@ -20,11 +20,19 @@
   import type { Hass } from "./types/ha";
   import type { LightState, SetLight } from "./types/app";
   import { getColors, getEnabledLights, persistState } from "./state";
-  import { getAPI, isValidHass } from "./api/helpers";
+  import { isValidHass } from "./api/helpers";
+  import EmbeddedHALightAPI from "./api/embedded-ha";
+  import ExternalHALightAPI from "./api/external-ha";
 
   export let hass: Hass | null = null;
+  const getHass = () => {
+    if (isValidHass(hass)) return hass;
+    throw new Error("Invalid hass");
+  };
   const darkMode = isValidHass(hass) ? hass.themes.darkMode : false;
-  const lightAPI = getAPI(hass);
+  const lightAPI = isValidHass(hass)
+    ? new EmbeddedHALightAPI(getHass)
+    : new ExternalHALightAPI();
 
   let enabledLights: string[] = getEnabledLights();
   let colors: string[] = getColors();
