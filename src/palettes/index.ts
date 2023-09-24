@@ -22,6 +22,7 @@ const sources: Record<
   five_point_palettes: () => import("./data/five_point_palettes.json"),
   docc: () => import("./data/docc.json"),
   lospec: () => import("./data/lospec.json"),
+  hue: () => import("./data/hue.json"),
 };
 
 function isCompressedPaletteV1(x: any): x is CompressedPaletteV1 {
