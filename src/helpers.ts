@@ -46,3 +46,14 @@ export function rgbTo8BitRGBTriple({ b, g, r }: Rgb) {
     clampInteger(b * 255, 0, 255),
   ];
 }
+
+export function shuffle<T>(x: T[]): void {
+  // Fisher-Yates shuffle
+  for (let i = x.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    // casts are OK: we know i and j are in bounds
+    const t = x[i] as T;
+    x[i] = x[j] as T;
+    x[j] = t;
+  }
+}
