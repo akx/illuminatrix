@@ -25,6 +25,7 @@
   import EmbeddedHALightAPI from "./api/embedded-ha";
   import ExternalHALightAPI from "./api/external-ha";
   import BrightnessControls from "./BrightnessControls.svelte";
+  import type { BrightnessMode } from "./types";
 
   export let hass: Hass | null = null;
   const getHass = () => {
@@ -39,7 +40,7 @@
   let enabledLights: string[] = getEnabledLights();
   let colors: string[] = getColors();
 
-  let brightnessMode: "set" | "keep" | "static" = "set";
+  let brightnessMode: BrightnessMode = "set";
   let brightnessMultiplier = 1;
   let lights: LightState[] = [];
   let lVariation: Variation = { ...defaultLVariation };
@@ -54,7 +55,12 @@
     const rgbs = getColorRGBs(colors);
     if (!rgbs.length) return;
     try {
-      persistState({ enabledLights, colors });
+      persistState({
+        enabledLights,
+        colors,
+        brightnessMultiplier,
+        brightnessMode,
+      });
     } catch (e) {
       // probably out of quota
     }

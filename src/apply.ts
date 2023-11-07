@@ -3,6 +3,7 @@ import type { Variation } from "./colors";
 import { varyColor } from "./colors";
 import * as culori from "culori";
 import type { LightAPI } from "./api/base";
+import type { BrightnessMode } from "./types";
 
 interface ApplyColorsParams {
   api: LightAPI;
@@ -11,7 +12,7 @@ interface ApplyColorsParams {
   lVariation: Variation | null;
   cVariation: Variation | null;
   hVariation: Variation | null;
-  brightnessMode?: "keep" | "set" | "static";
+  brightnessMode?: BrightnessMode;
   brightnessMultiplier?: number;
 }
 

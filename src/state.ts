@@ -1,3 +1,5 @@
+import type { BrightnessMode } from "./types";
+
 const defaultColors = ["#ffc030", "#c05a10"];
 
 function getStringArray(key: string) {
@@ -10,6 +12,7 @@ function getStringArray(key: string) {
 
 const ENABLED_LIGHTS_KEY = "illuminatrix.enabledLights";
 const COLORS_KEY = "illuminatrix.colors";
+const BRIGHTNESS_KEY = "illuminatrix.brightness";
 
 export function getEnabledLights(): string[] {
   try {
@@ -32,9 +35,20 @@ export function getColors(): string[] {
 interface PersistStateParams {
   enabledLights: string[];
   colors: string[];
+  brightnessMode: BrightnessMode;
+  brightnessMultiplier: number;
 }
 
-export function persistState({ enabledLights, colors }: PersistStateParams) {
+export function persistState({
+  enabledLights,
+  colors,
+  brightnessMultiplier,
+  brightnessMode,
+}: PersistStateParams) {
   localStorage.setItem(ENABLED_LIGHTS_KEY, JSON.stringify(enabledLights));
   localStorage.setItem(COLORS_KEY, JSON.stringify(colors));
+  localStorage.setItem(
+    BRIGHTNESS_KEY,
+    JSON.stringify({ brightnessMode, brightnessMultiplier }),
+  );
 }
