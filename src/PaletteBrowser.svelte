@@ -3,19 +3,22 @@
   import VirtualList from "./vendor/VirtualList.svelte";
   import { getPalettes } from "./palettes";
   import type { Palette } from "./palettes/types";
+  import { persisted } from "svelte-persisted-store";
 
   const dispatch = createEventDispatcher();
+
   let palettes: Palette[] = [];
   let collections: string[] = [];
-  let collectionFilter: string = "";
-  let paletteFilter: string = "";
-  let minColors: number | null = null;
-  let maxColors: number | null = null;
   let filteredPalettes: Palette[] = [];
-  let append: boolean = false;
-  let extendedSearch: boolean = false;
 
-  $: applyOrAppend = append ? "Append" : "Apply";
+  let collectionFilter = persisted("illuminatrix.collectionFilter", "");
+  let paletteFilter = persisted("illuminatrix.paletteFilter", "");
+  let minColors = persisted<number | null>("illuminatrix.minColors", null);
+  let maxColors = persisted<number | null>("illuminatrix.maxColors", null);
+  let append = persisted<boolean>("illuminatrix.append", false);
+  let extendedSearch = persisted<boolean>("illuminatrix.extendedSearch", false);
+
+  $: applyOrAppend = $append ? "Append" : "Apply";
 
   onMount(async () => {
     palettes = await getPalettes();
@@ -25,28 +28,27 @@
   function selectRandom() {
     let palette =
       filteredPalettes[Math.floor(Math.random() * filteredPalettes.length)];
-    if (palette) dispatch("select", { palette, append });
+    if (palette) dispatch("select", { palette, $append });
   }
 
   function resetSearch() {
-    collectionFilter = "";
-    paletteFilter = "";
-    minColors = null;
-    maxColors = null;
+    $collectionFilter = "";
+    $paletteFilter = "";
+    $minColors = null;
+    $maxColors = null;
   }
 
   $: {
-    const filterRe = paletteFilter.trim()
-      ? new RegExp(paletteFilter.trim(), "i")
-      : null;
+    let f = $paletteFilter.trim();
+    const filterRe = f ? new RegExp(f, "i") : null;
     filteredPalettes = palettes.filter(
       (p) =>
-        (!collectionFilter || p.collection === collectionFilter) &&
+        (!$collectionFilter || p.collection === $collectionFilter) &&
         (!filterRe ||
           filterRe.test(p.name) ||
           filterRe.test((p.tags ?? []).join(" "))) &&
-        (minColors === null || p.colors.length >= minColors) &&
-        (maxColors === null || p.colors.length <= maxColors),
+        ($minColors === null || p.colors.length >= $minColors) &&
+        ($maxColors === null || p.colors.length <= $maxColors),
     );
   }
 </script>
@@ -61,13 +63,14 @@
 </div>
 <div class="pb-2 px-1 flex justify-between align-middle">
   <label class="label block cursor-pointer">
-    <input type="checkbox" bind:checked={append} value="1" /> Append to current colors
+    <input type="checkbox" bind:checked={$append} value="1" /> Append to current
+    colors
   </label>
 </div>
 
 <div class={"flex"}>
   <select
-    bind:value={collectionFilter}
+    bind:value={$collectionFilter}
     class={"flex-auto w-24 select-sm select"}
   >
     <option value="">All</option>
@@ -78,29 +81,29 @@
   <input
     type="search"
     placeholder="Search"
-    bind:value={paletteFilter}
+    bind:value={$paletteFilter}
     class={"input input-sm flex-auto w-32"}
   />
   <button
     class={"btn btn-sm join-item"}
-    on:click={() => (extendedSearch = !extendedSearch)}
+    on:click={() => extendedSearch.update((p) => !p)}
     title="Extended search"
   >
-    {extendedSearch ? "-" : "+"}
+    {$extendedSearch ? "-" : "+"}
   </button>
 </div>
-{#if extendedSearch}
+{#if $extendedSearch}
   <div class={"flex py-2"}>
     <input
       type="number"
       min="1"
-      bind:value={minColors}
+      bind:value={$minColors}
       placeholder="Min colors"
       class={"input input-sm flex-auto"}
     />
     <input
       type="number"
-      bind:value={maxColors}
+      bind:value={$maxColors}
       placeholder="Max colors"
       class={"input input-sm flex-auto"}
     />
@@ -115,7 +118,7 @@
       <button
         class={"appearance-none block w-full p-1 cursor-pointer text-left bg-transparent hover:bg-gray-300 dark:hover:bg-gray-700 border-0"}
         on:click={(e) =>
-          dispatch("select", { palette: item, append: e.shiftKey || append })}
+          dispatch("select", { palette: item, append: e.shiftKey || $append })}
       >
         <div class="flex justify-between">
           <div>
