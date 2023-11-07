@@ -4,6 +4,7 @@
   import { getPalettes } from "./palettes";
   import type { Palette } from "./palettes/types";
   import { persisted } from "svelte-persisted-store";
+  import { shuffle } from "./helpers";
 
   const dispatch = createEventDispatcher();
 
@@ -50,6 +51,7 @@
         ($minColors === null || p.colors.length >= $minColors) &&
         ($maxColors === null || p.colors.length <= $maxColors),
     );
+    shuffle(filteredPalettes);
   }
 </script>
 

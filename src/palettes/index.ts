@@ -3,6 +3,7 @@ import type {
   Palette,
   PaletteCollectionJSON,
 } from "./types";
+import orderBy from "lodash-es/orderBy";
 
 const EMPTY_PALETTE: Palette = {
   author: "",
@@ -90,23 +91,11 @@ function getPalettesFromCollection({
   );
 }
 
-function shuffle<T>(x: T[]): void {
-  // Fisher-Yates shuffle
-  for (let i = x.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    // casts are OK: we know i and j are in bounds
-    const t = x[i] as T;
-    x[i] = x[j] as T;
-    x[j] = t;
-  }
-}
-
 export async function getPalettes(): Promise<Palette[]> {
   const promises = Object.values(sources).map((source) => source());
   const results = await Promise.all(promises);
   const palettes = results.flatMap((result) =>
     getPalettesFromCollection(result.default as PaletteCollectionJSON),
   );
-  shuffle(palettes);
-  return palettes;
+  return orderBy(palettes, ["collection", "name"], ["asc", "asc"]);
 }
