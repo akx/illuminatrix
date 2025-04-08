@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from "svelte/legacy";
+
   import { createEventDispatcher, onMount } from "svelte";
   import VirtualList from "./vendor/VirtualList.svelte";
   import { getPalettes } from "./palettes";
@@ -8,9 +10,9 @@
 
   const dispatch = createEventDispatcher();
 
-  let palettes: Palette[] = [];
-  let collections: string[] = [];
-  let filteredPalettes: Palette[] = [];
+  let palettes: Palette[] = $state([]);
+  let collections: string[] = $state([]);
+  let filteredPalettes: Palette[] = $state([]);
 
   let collectionFilter = persisted("illuminatrix.collectionFilter", "");
   let paletteFilter = persisted("illuminatrix.paletteFilter", "");
@@ -19,7 +21,7 @@
   let append = persisted<boolean>("illuminatrix.append", false);
   let extendedSearch = persisted<boolean>("illuminatrix.extendedSearch", false);
 
-  $: applyOrAppend = $append ? "Append" : "Apply";
+  let applyOrAppend = $derived($append ? "Append" : "Apply");
 
   onMount(async () => {
     palettes = await getPalettes();
@@ -39,7 +41,7 @@
     $maxColors = null;
   }
 
-  $: {
+  run(() => {
     let f = $paletteFilter.trim();
     const filterRe = f ? new RegExp(f, "i") : null;
     filteredPalettes = palettes.filter(
@@ -52,15 +54,15 @@
         ($maxColors === null || p.colors.length <= $maxColors),
     );
     shuffle(filteredPalettes);
-  }
+  });
 </script>
 
 <div class="pb-2 px-1 flex justify-between align-middle">
   <div>
-    <button class="btn join-item" on:click={selectRandom}>
+    <button class="btn join-item" onclick={selectRandom}>
       {applyOrAppend} random
     </button>
-    <button class="btn join-item" on:click={resetSearch}>Reset search</button>
+    <button class="btn join-item" onclick={resetSearch}>Reset search</button>
   </div>
 </div>
 <div class="pb-2 px-1 flex justify-between align-middle">
@@ -88,7 +90,7 @@
   />
   <button
     class={"btn btn-sm join-item"}
-    on:click={() => extendedSearch.update((p) => !p)}
+    onclick={() => extendedSearch.update((p) => !p)}
     title="Extended search"
   >
     {$extendedSearch ? "-" : "+"}
@@ -116,27 +118,32 @@
   {#if !filteredPalettes.length}
     <div class={"text-center text-gray-500"}>No palettes found.</div>
   {:else}
-    <VirtualList items={filteredPalettes} let:item height="500px">
-      <button
-        class={"appearance-none block w-full p-1 cursor-pointer text-left bg-transparent hover:bg-gray-300 dark:hover:bg-gray-700 border-0"}
-        on:click={(e) =>
-          dispatch("select", { palette: item, append: e.shiftKey || $append })}
-      >
-        <div class="flex justify-between">
-          <div>
-            {item.name}
+    <VirtualList items={filteredPalettes} height="500px">
+      {#snippet children({ item })}
+        <button
+          class={"appearance-none block w-full p-1 cursor-pointer text-left bg-transparent hover:bg-gray-300 dark:hover:bg-gray-700 border-0"}
+          onclick={(e) =>
+            dispatch("select", {
+              palette: item,
+              append: e.shiftKey || $append,
+            })}
+        >
+          <div class="flex justify-between">
+            <div>
+              {item.name}
+            </div>
+            <div class={"text-xs text-gray-500"}>
+              {#if item.author}{item.author}{/if}
+              {#if item.collection}- {item.collection}{/if}
+            </div>
           </div>
-          <div class={"text-xs text-gray-500"}>
-            {#if item.author}{item.author}{/if}
-            {#if item.collection}- {item.collection}{/if}
+          <div class={"flex border border-solid border-black h-6"}>
+            {#each item.colors as color}
+              <div class={"flex-1"} style={`background-color: ${color}`}></div>
+            {/each}
           </div>
-        </div>
-        <div class={"flex border border-solid border-black h-6"}>
-          {#each item.colors as color}
-            <div class={"flex-1"} style={`background-color: ${color}`} />
-          {/each}
-        </div>
-      </button>
+        </button>
+      {/snippet}
     </VirtualList>
   {/if}
 {/key}

@@ -71,6 +71,12 @@ export default class ExternalHALightAPI extends BaseHALightAPI {
   private _ws: HassWebSocket | null = null;
   private _registry: HassStaticRegistry | null = null;
 
+  public static canUse(): boolean {
+    return (
+      !!import.meta.env?.VITE_HA_API_URL && !!import.meta.env?.VITE_HA_API_TOKEN
+    );
+  }
+
   private onDisconnect = (ws: HassWebSocket) => {
     if (ws === this._ws) {
       this._ws = null;

@@ -1,8 +1,17 @@
 <script lang="ts">
-  export let label = "...";
-  export let variation = 0.1;
-  export let minimum = 0.1;
-  export let maximum = 1;
+  interface Props {
+    label?: string;
+    variation?: number;
+    minimum?: number;
+    maximum?: number;
+  }
+
+  let {
+    label = "...",
+    variation = $bindable(0.1),
+    minimum = $bindable(0.1),
+    maximum = $bindable(1),
+  }: Props = $props();
 </script>
 
 <div class="card card-compact">

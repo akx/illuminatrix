@@ -26,26 +26,44 @@
   import ExternalHALightAPI from "./api/external-ha";
   import BrightnessControls from "./BrightnessControls.svelte";
   import type { BrightnessMode } from "./types";
+  import type { LightAPI } from "./api/base";
+  import DummyHALightAPI from "./api/dummy-ha";
 
-  export let hass: Hass | null = null;
+  export interface AppProps {
+    initialHass: Hass | null;
+  }
+
+  let props: AppProps = $props();
+  let hass = $state.raw<Hass | null>(null);
+  let lightAPI = $state.raw<LightAPI>(new DummyHALightAPI());
+  export function setHass(newHass: Hass | null) {
+    if (hass === newHass) return;
+    hass = newHass;
+    if (isValidHass(hass)) {
+      lightAPI = new EmbeddedHALightAPI(getHass);
+    } else if (ExternalHALightAPI.canUse()) {
+      lightAPI = new ExternalHALightAPI();
+    } else {
+      lightAPI = new DummyHALightAPI();
+    }
+  }
+
   const getHass = () => {
     if (isValidHass(hass)) return hass;
     throw new Error("Invalid hass");
   };
-  const darkMode = isValidHass(hass) ? hass.themes.darkMode : false;
-  const lightAPI = isValidHass(hass)
-    ? new EmbeddedHALightAPI(getHass)
-    : new ExternalHALightAPI();
 
-  let enabledLights: string[] = getEnabledLights();
-  let colors: string[] = getColors();
+  const darkMode = $derived(isValidHass(hass) ? hass.themes.darkMode : false);
 
-  let brightnessMode: BrightnessMode = "set";
-  let brightnessMultiplier = 1;
-  let lights: LightState[] = [];
-  let lVariation: Variation = { ...defaultLVariation };
-  let cVariation: Variation = { ...defaultCVariation };
-  let hVariation: Variation = { ...defaultHVariation };
+  let enabledLights: string[] = $state(getEnabledLights());
+  let colors: string[] = $state(getColors());
+
+  let brightnessMode: BrightnessMode = $state("set");
+  let brightnessMultiplier = $state(1);
+  let lights: LightState[] = $state([]);
+  let lVariation: Variation = $state({ ...defaultLVariation });
+  let cVariation: Variation = $state({ ...defaultCVariation });
+  let hVariation: Variation = $state({ ...defaultHVariation });
 
   async function reloadLights() {
     lights = await lightAPI.getLightStates();
@@ -117,20 +135,23 @@
     }
   }
 
-  onMount(reloadLights);
+  onMount(() => {
+    setHass(props.initialHass);
+    return reloadLights();
+  });
 </script>
 
 <main class={cx(darkMode ? "dark" : false)}>
   <div class="toolbar flex py-1 gap-1">
     <button
       class="btn btn-success basis-2 flex-auto"
-      on:click={() => applyColors(false)}
+      onclick={() => applyColors(false)}
       disabled={colors.length === 0}
       >Apply
     </button>
     <button
       class="btn btn-success basis-1 flex-auto"
-      on:click={() => applyColors(true)}
+      onclick={() => applyColors(true)}
       disabled={colors.length === 0}
       >Apply with variation
     </button>

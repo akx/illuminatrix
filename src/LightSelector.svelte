@@ -7,8 +7,12 @@
 
   const dispatch = createEventDispatcher();
 
-  export let lights: LightState[] = [];
-  export let enabledLights: string[] = [];
+  interface Props {
+    lights: LightState[];
+    enabledLights: string[];
+  }
+
+  let { lights = [], enabledLights = $bindable([]) }: Props = $props();
 
   function setEnabledLights(
     mode: "set" | "add" | "remove",
@@ -33,7 +37,7 @@
     }
   }
 
-  $: lightGroups = groupLights(lights, enabledLights);
+  let lightGroups = $derived(groupLights(lights, enabledLights));
   const stateTexts = {
     unavailable: "🚫",
     off: "Off",
@@ -45,16 +49,16 @@
   <div class="pb-2">
     <button
       class="btn btn-outline"
-      on:click={() => setEnabledLights("set", lights)}
+      onclick={() => setEnabledLights("set", lights)}
     >
       All
     </button>
-    <button class="btn btn-outline" on:click={() => setEnabledLights("set", [])}
+    <button class="btn btn-outline" onclick={() => setEnabledLights("set", [])}
       >None
     </button>
   </div>
   <div class="join">
-    <button class="btn btn-outline" on:click={() => dispatch("reload")}
+    <button class="btn btn-outline" onclick={() => dispatch("reload")}
       >Reload
     </button>
   </div>
@@ -70,14 +74,14 @@
           <td colspan="3" class="text-right">
             <button
               class="btn btn-outline btn-xs"
-              on:click={(e) =>
+              onclick={(e) =>
                 setEnabledLights("add", group.lights, !e.shiftKey)}
             >
               All
             </button>
             <button
               class="btn btn-outline btn-xs"
-              on:click={(e) =>
+              onclick={(e) =>
                 setEnabledLights("remove", group.lights, !e.shiftKey)}
             >
               None
@@ -111,7 +115,7 @@
             {:else}
               <button
                 class="btn btn-xs"
-                on:click={() =>
+                onclick={() =>
                   dispatch("set", {
                     entityId: light.id,
                     state: light.state !== "on",
@@ -129,7 +133,7 @@
               value={light.brightness ?? 0}
               disabled={light.state === "unavailable"}
               class={"w-16"}
-              on:change={(e) =>
+              onchange={(e) =>
                 dispatch("set", {
                   entityId: light.id,
                   brightness: e.currentTarget.valueAsNumber,
@@ -142,7 +146,7 @@
               class={"w-full"}
               disabled={light.state === "unavailable"}
               value={rgbTripleToHex(light.rgbColor ?? [255, 255, 255])}
-              on:change={(e) =>
+              onchange={(e) =>
                 dispatch("set", {
                   entityId: light.id,
                   color: e.currentTarget.value,

@@ -1,6 +1,13 @@
 <script lang="ts">
-  export let brightnessMode: "set" | "keep" | "static" = "set";
-  export let brightnessMultiplier: number = 1;
+  interface Props {
+    brightnessMode: "set" | "keep" | "static";
+    brightnessMultiplier: number;
+  }
+
+  let {
+    brightnessMode = $bindable("set"),
+    brightnessMultiplier = $bindable(1),
+  }: Props = $props();
 </script>
 
 <div>
