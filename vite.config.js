@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
+import tailwind from "@tailwindcss/vite";
 import { resolve } from "path";
 
 const isLibBuild = !!process.env.ILLUMINATRIX_LIB;
@@ -12,6 +13,7 @@ export default defineConfig({
     svelte({
       emitCss: false, // no extra CSS
     }),
+    tailwind(),
   ],
   base: "./",
   json: {

@@ -15,11 +15,12 @@
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^3.1.0",
+    "@tailwindcss/postcss": "^4.1.3",
+    "@tailwindcss/vite": "^4.1.3",
     "@types/culori": "^2.1.0",
     "@types/lodash-es": "^4.17.12",
     "@typescript-eslint/eslint-plugin": "^7.7.0",
     "@typescript-eslint/parser": "^7.7.0",
-    "autoprefixer": "^10.4.19",
     "eslint": "^8.57.0",
     "eslint-plugin-svelte": "^2.37.0",
     "postcss": "^8.4.38",
@@ -27,7 +28,7 @@
     "prettier-plugin-svelte": "^3.2.3",
     "svelte": "^4.2.15",
     "svelte-check": "^3.6.9",
-    "tailwindcss": "^3.4.3",
+    "tailwindcss": "^4.1.3",
     "typescript": "^5.4.5",
     "vite": "^5.2.10"
   },
