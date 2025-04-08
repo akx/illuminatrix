@@ -72,13 +72,13 @@
   </label>
 </div>
 
-<div class={"flex"}>
+<div class="flex">
   <select
     bind:value={$collectionFilter}
-    class={"flex-auto w-24 select-sm select"}
+    class="flex-auto w-24 select-sm select"
   >
     <option value="">All</option>
-    {#each collections as collection}
+    {#each collections as collection (collection)}
       <option value={collection}>{collection}</option>
     {/each}
   </select>
@@ -86,10 +86,10 @@
     type="search"
     placeholder="Search"
     bind:value={$paletteFilter}
-    class={"input input-sm flex-auto w-32"}
+    class="input input-sm flex-auto w-32"
   />
   <button
-    class={"btn btn-sm join-item"}
+    class="btn btn-sm join-item"
     onclick={() => extendedSearch.update((p) => !p)}
     title="Extended search"
   >
@@ -97,31 +97,31 @@
   </button>
 </div>
 {#if $extendedSearch}
-  <div class={"flex py-2"}>
+  <div class="flex py-2">
     <input
       type="number"
       min="1"
       bind:value={$minColors}
       placeholder="Min colors"
-      class={"input input-sm flex-auto"}
+      class="input input-sm flex-auto"
     />
     <input
       type="number"
       bind:value={$maxColors}
       placeholder="Max colors"
-      class={"input input-sm flex-auto"}
+      class="input input-sm flex-auto"
     />
   </div>
 {/if}
 
 {#key filteredPalettes.length}
   {#if !filteredPalettes.length}
-    <div class={"text-center text-gray-500"}>No palettes found.</div>
+    <div class="text-center text-gray-500">No palettes found.</div>
   {:else}
     <VirtualList items={filteredPalettes} height="500px">
       {#snippet children({ item })}
         <button
-          class={"appearance-none block w-full p-1 cursor-pointer text-left bg-transparent hover:bg-gray-300 dark:hover:bg-gray-700 border-0"}
+          class="appearance-none block w-full p-1 cursor-pointer text-left bg-transparent hover:bg-gray-300 dark:hover:bg-gray-700 border-0"
           onclick={(e) =>
             dispatch("select", {
               palette: item,
@@ -132,14 +132,14 @@
             <div>
               {item.name}
             </div>
-            <div class={"text-xs text-gray-500"}>
+            <div class="text-xs text-gray-500">
               {#if item.author}{item.author}{/if}
               {#if item.collection}- {item.collection}{/if}
             </div>
           </div>
-          <div class={"flex border border-solid border-black h-6"}>
-            {#each item.colors as color}
-              <div class={"flex-1"} style={`background-color: ${color}`}></div>
+          <div class="flex border border-solid border-black h-6">
+            {#each item.colors as color (color)}
+              <div class="flex-1" style={`background-color: ${color}`}></div>
             {/each}
           </div>
         </button>

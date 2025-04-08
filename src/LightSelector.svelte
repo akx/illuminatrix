@@ -63,12 +63,12 @@
     </button>
   </div>
 </div>
-<table class={"w-full"}>
+<table class="w-full">
   <tbody>
     {#each lightGroups as group (group.name)}
       {#if lightGroups.length > 1}
         <tr>
-          <td class={"font-bold"}>
+          <td class="font-bold">
             {group.name}
           </td>
           <td colspan="3" class="text-right">
@@ -89,7 +89,7 @@
           </td></tr
         >
       {/if}
-      {#each group.lights as light}
+      {#each group.lights as light (light.id)}
         <tr>
           <td>
             <label>
@@ -132,7 +132,7 @@
               max="255"
               value={light.brightness ?? 0}
               disabled={light.state === "unavailable"}
-              class={"w-16"}
+              class="w-16"
               onchange={(e) =>
                 dispatch("set", {
                   entityId: light.id,
@@ -140,10 +140,10 @@
                 })}
             />
           </td>
-          <td class={"w-1/4"}>
+          <td class="w-1/4">
             <input
               type="color"
-              class={"w-full"}
+              class="w-full"
               disabled={light.state === "unavailable"}
               value={rgbTripleToHex(light.rgbColor ?? [255, 255, 255])}
               onchange={(e) =>

@@ -22,7 +22,7 @@
     <span>{title}</span>
   </button>
   {#if open}
-    <div class={"py-2"}>
+    <div class="py-2">
       {@render children?.()}
     </div>
   {/if}

@@ -31,27 +31,27 @@
     Clear
   </button>
 </div>
-<div class={"grid grid-cols-5 gap-2"}>
-  {#each colors as color, i}
+<div class="grid grid-cols-5 gap-2">
+  {#each colors as color, i (color)}
     <div>
       <input type="color" class="x-swatch" bind:value={colors[i]} />
-      <div class={"flex"}>
+      <div class="flex">
         <button
-          class={"flex-1 btn btn-xs text-red-400"}
+          class="flex-1 btn btn-xs text-red-400"
           onclick={() => (colors = colors.filter((_, j) => i !== j))}
           title="Remove color"
         >
           &times;
         </button>
         <button
-          class={"flex-1 btn btn-xs text-green-500"}
+          class="flex-1 btn btn-xs text-green-500"
           onclick={() => (colors = [...colors, color])}
           title="Duplicate color"
         >
           +
         </button>
         <button
-          class={"flex-1 btn btn-xs"}
+          class="flex-1 btn btn-xs"
           onclick={() => dispatch("applyVariation", { colors, index: i })}
           title="Vary color"
         >

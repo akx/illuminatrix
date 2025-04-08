@@ -162,7 +162,7 @@
       Illuminatrix {version}
     </div>
   </div>
-  <div class={"flex flex-1 p-1 gap-1 flex-col md:flex-row min-h-[20em]"}>
+  <div class="flex flex-1 p-1 gap-1 flex-col md:flex-row min-h-[20em]">
     <Section title="Lights">
       <LightSelector
         {lights}

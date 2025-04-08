@@ -34,9 +34,6 @@ export default defineConfig([
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": "off",
-      "svelte/no-useless-mustaches": "off", // TODO
-      "svelte/require-each-key": "off", // TODO
-      "svelte/require-event-dispatcher-types": "off", // TODO
     },
   },
 ]);
