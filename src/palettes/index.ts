@@ -64,7 +64,7 @@ function decompressPalette(
       colors: compressedColorsOrIndices.map((c) =>
         typeof c === "string"
           ? decompressColorString(c)
-          : colorMap[c] ?? "#ff00ff",
+          : (colorMap[c] ?? "#ff00ff"),
       ),
       date: new Date(timestamp * 1000).toISOString(),
       tags: tagIndices.map((i) => tagMap[i] ?? "<unknown>"),
