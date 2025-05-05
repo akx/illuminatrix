@@ -123,11 +123,7 @@
     await reloadLights();
   }
 
-  function handleSelectPalette({
-    detail: { palette, append },
-  }: {
-    detail: { palette: Palette; append: boolean };
-  }) {
+  function handleSelectPalette(palette: Palette, append: boolean) {
     if (append) {
       colors = [...colors, ...palette.colors];
     } else {
@@ -179,7 +175,7 @@
       />
     </Section>
     <Section title="Palettes">
-      <PaletteBrowser on:select={handleSelectPalette} />
+      <PaletteBrowser onSelect={handleSelectPalette} />
     </Section>
     <Section title="Variation" open={false}>
       <VariationConfig bind:lVariation bind:cVariation bind:hVariation />

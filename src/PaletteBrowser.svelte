@@ -1,18 +1,36 @@
 <script lang="ts">
-  import { run } from "svelte/legacy";
-
-  import { createEventDispatcher, onMount } from "svelte";
+  import { onMount } from "svelte";
   import VirtualList from "./vendor/VirtualList.svelte";
   import { getPalettes } from "./palettes";
   import type { Palette } from "./palettes/types";
   import { persisted } from "svelte-persisted-store";
   import { shuffle } from "./helpers";
 
-  const dispatch = createEventDispatcher();
+  interface PaletteBrowserProps {
+    onSelect: (palette: Palette, append: boolean) => void;
+  }
+  const { onSelect }: PaletteBrowserProps = $props();
 
   let palettes: Palette[] = $state([]);
   let collections: string[] = $state([]);
-  let filteredPalettes: Palette[] = $state([]);
+  let resetTimestamp = $state(0);
+
+  let filteredPalettes = $derived.by(() => {
+    const f = $paletteFilter.trim();
+    const filterRe = f ? new RegExp(f, "i") : null;
+    const filteredPalettes = palettes.filter(
+      (p) =>
+        (!$collectionFilter || p.collection === $collectionFilter) &&
+        (!filterRe ||
+          filterRe.test(p.name) ||
+          filterRe.test((p.tags ?? []).join(" "))) &&
+        ($minColors === null || p.colors.length >= $minColors) &&
+        ($maxColors === null || p.colors.length <= $maxColors),
+    );
+    const _x = 0 | resetTimestamp;
+    shuffle(filteredPalettes);
+    return filteredPalettes;
+  });
 
   let collectionFilter = persisted("illuminatrix.collectionFilter", "");
   let paletteFilter = persisted("illuminatrix.paletteFilter", "");
@@ -29,9 +47,9 @@
   });
 
   function selectRandom() {
-    let palette =
+    const palette =
       filteredPalettes[Math.floor(Math.random() * filteredPalettes.length)];
-    if (palette) dispatch("select", { palette, $append });
+    if (palette) onSelect(palette, $append);
   }
 
   function resetSearch() {
@@ -39,22 +57,8 @@
     $paletteFilter = "";
     $minColors = null;
     $maxColors = null;
+    resetTimestamp = Date.now();
   }
-
-  run(() => {
-    let f = $paletteFilter.trim();
-    const filterRe = f ? new RegExp(f, "i") : null;
-    filteredPalettes = palettes.filter(
-      (p) =>
-        (!$collectionFilter || p.collection === $collectionFilter) &&
-        (!filterRe ||
-          filterRe.test(p.name) ||
-          filterRe.test((p.tags ?? []).join(" "))) &&
-        ($minColors === null || p.colors.length >= $minColors) &&
-        ($maxColors === null || p.colors.length <= $maxColors),
-    );
-    shuffle(filteredPalettes);
-  });
 </script>
 
 <div class="pb-2 px-1 flex justify-between align-middle">
@@ -122,11 +126,7 @@
       {#snippet children({ item })}
         <button
           class="appearance-none block w-full p-1 cursor-pointer text-left bg-transparent hover:bg-gray-300 dark:hover:bg-gray-700 border-0"
-          onclick={(e) =>
-            dispatch("select", {
-              palette: item,
-              append: e.shiftKey || $append,
-            })}
+          onclick={(event) => onSelect(item, event.shiftKey || $append)}
         >
           <div class="flex justify-between">
             <div>
