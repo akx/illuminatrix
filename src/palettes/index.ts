@@ -3,7 +3,7 @@ import type {
   Palette,
   PaletteCollectionJSON,
 } from "./types";
-import orderBy from "lodash-es/orderBy";
+import { orderBy } from "../nodash";
 
 const EMPTY_PALETTE: Palette = {
   author: "",
@@ -64,7 +64,7 @@ function decompressPalette(
       colors: compressedColorsOrIndices.map((c) =>
         typeof c === "string"
           ? decompressColorString(c)
-          : colorMap[c] ?? "#ff00ff",
+          : (colorMap[c] ?? "#ff00ff"),
       ),
       date: new Date(timestamp * 1000).toISOString(),
       tags: tagIndices.map((i) => tagMap[i] ?? "<unknown>"),
@@ -97,5 +97,9 @@ export async function getPalettes(): Promise<Palette[]> {
   const palettes = results.flatMap((result) =>
     getPalettesFromCollection(result.default as PaletteCollectionJSON),
   );
-  return orderBy(palettes, ["collection", "name"], ["asc", "asc"]);
+  return orderBy(
+    palettes,
+    [(p) => p.collection, (p) => p.name],
+    ["asc", "asc"],
+  );
 }

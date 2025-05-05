@@ -8,9 +8,17 @@
     zeroVariation,
   } from "./consts";
 
-  export let lVariation: Variation = { ...zeroVariation };
-  export let cVariation: Variation = { ...zeroVariation };
-  export let hVariation: Variation = { ...zeroVariation };
+  interface Props {
+    lVariation?: Variation;
+    cVariation?: Variation;
+    hVariation?: Variation;
+  }
+
+  let {
+    lVariation = $bindable({ ...zeroVariation }),
+    cVariation = $bindable({ ...zeroVariation }),
+    hVariation = $bindable({ ...zeroVariation }),
+  }: Props = $props();
 
   function zeroAll() {
     lVariation = { ...zeroVariation };
@@ -26,8 +34,8 @@
 </script>
 
 <div class="pb-2">
-  <button class="btn btn-outline" on:click={zeroAll}>Zero All</button>
-  <button class="btn btn-outline" on:click={defaultAll}>Defaults</button>
+  <button class="btn btn-outline" onclick={zeroAll}>Zero All</button>
+  <button class="btn btn-outline" onclick={defaultAll}>Defaults</button>
 </div>
 
 <VariationConfigRow

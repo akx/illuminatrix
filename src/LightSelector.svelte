@@ -7,8 +7,12 @@
 
   const dispatch = createEventDispatcher();
 
-  export let lights: LightState[] = [];
-  export let enabledLights: string[] = [];
+  interface Props {
+    lights: LightState[];
+    enabledLights: string[];
+  }
+
+  let { lights = [], enabledLights = $bindable([]) }: Props = $props();
 
   function setEnabledLights(
     mode: "set" | "add" | "remove",
@@ -33,7 +37,7 @@
     }
   }
 
-  $: lightGroups = groupLights(lights, enabledLights);
+  let lightGroups = $derived(groupLights(lights, enabledLights));
   const stateTexts = {
     unavailable: "🚫",
     off: "Off",
@@ -45,39 +49,39 @@
   <div class="pb-2">
     <button
       class="btn btn-outline"
-      on:click={() => setEnabledLights("set", lights)}
+      onclick={() => setEnabledLights("set", lights)}
     >
       All
     </button>
-    <button class="btn btn-outline" on:click={() => setEnabledLights("set", [])}
+    <button class="btn btn-outline" onclick={() => setEnabledLights("set", [])}
       >None
     </button>
   </div>
   <div class="join">
-    <button class="btn btn-outline" on:click={() => dispatch("reload")}
+    <button class="btn btn-outline" onclick={() => dispatch("reload")}
       >Reload
     </button>
   </div>
 </div>
-<table class={"w-full"}>
+<table class="w-full">
   <tbody>
     {#each lightGroups as group (group.name)}
       {#if lightGroups.length > 1}
         <tr>
-          <td class={"font-bold"}>
+          <td class="font-bold">
             {group.name}
           </td>
           <td colspan="3" class="text-right">
             <button
               class="btn btn-outline btn-xs"
-              on:click={(e) =>
+              onclick={(e) =>
                 setEnabledLights("add", group.lights, !e.shiftKey)}
             >
               All
             </button>
             <button
               class="btn btn-outline btn-xs"
-              on:click={(e) =>
+              onclick={(e) =>
                 setEnabledLights("remove", group.lights, !e.shiftKey)}
             >
               None
@@ -85,7 +89,7 @@
           </td></tr
         >
       {/if}
-      {#each group.lights as light}
+      {#each group.lights as light (light.id)}
         <tr>
           <td>
             <label>
@@ -111,7 +115,7 @@
             {:else}
               <button
                 class="btn btn-xs"
-                on:click={() =>
+                onclick={() =>
                   dispatch("set", {
                     entityId: light.id,
                     state: light.state !== "on",
@@ -128,21 +132,21 @@
               max="255"
               value={light.brightness ?? 0}
               disabled={light.state === "unavailable"}
-              class={"w-16"}
-              on:change={(e) =>
+              class="w-16"
+              onchange={(e) =>
                 dispatch("set", {
                   entityId: light.id,
                   brightness: e.currentTarget.valueAsNumber,
                 })}
             />
           </td>
-          <td class={"w-1/4"}>
+          <td class="w-1/4">
             <input
               type="color"
-              class={"w-full"}
+              class="w-full"
               disabled={light.state === "unavailable"}
               value={rgbTripleToHex(light.rgbColor ?? [255, 255, 255])}
-              on:change={(e) =>
+              onchange={(e) =>
                 dispatch("set", {
                   entityId: light.id,
                   color: e.currentTarget.value,
