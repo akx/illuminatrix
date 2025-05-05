@@ -3,7 +3,7 @@ import type {
   Palette,
   PaletteCollectionJSON,
 } from "./types";
-import orderBy from "lodash-es/orderBy";
+import { orderBy } from "../nodash";
 
 const EMPTY_PALETTE: Palette = {
   author: "",
@@ -97,5 +97,9 @@ export async function getPalettes(): Promise<Palette[]> {
   const palettes = results.flatMap((result) =>
     getPalettesFromCollection(result.default as PaletteCollectionJSON),
   );
-  return orderBy(palettes, ["collection", "name"], ["asc", "asc"]);
+  return orderBy(
+    palettes,
+    [(p) => p.collection, (p) => p.name],
+    ["asc", "asc"],
+  );
 }

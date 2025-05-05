@@ -1,6 +1,5 @@
 import type { LightState } from "./types/app";
-import orderBy from "lodash-es/orderBy";
-import groupBy from "lodash-es/groupBy";
+import { groupBy, orderBy } from "./nodash";
 
 export function sortLights(lights: readonly LightState[]): LightState[] {
   return orderBy(
